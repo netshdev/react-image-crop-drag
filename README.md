@@ -7,6 +7,7 @@ A React component for creating draggable image views with automatic scaling and 
 - **Vertical drag adjustment** for perfect image positioning
 - **Automatic image scaling** while maintaining aspect ratio
 - **Smooth animations and transitions**
+- **Accessibility first** with keyboard navigation
 - **Touch device support** for mobile interactions
 - **Center positioning** with smart constraints
 - **No image overflow**
@@ -34,6 +35,7 @@ function App() {
   return (
     <ImageCropView
       src="/path/to/concert-poster.jpg"
+      alt="Concert Poster 2024" 
       containerWidth={800}
       containerHeight={400}
       isEditing={isEditing}
@@ -44,15 +46,24 @@ function App() {
 
 ```
 
+## Accessibility
+
+This component is built with accessibility in mind:
+
+- **Keyboard Support**: When in editing mode, the container is focusable. Use **Up/Down Arrow keys** to adjust the image position.
+- **Screen Readers**: Helper texts and ARIA attributes provide context to screen reader users.
+- **Touch Support**: Full touch support for dragging on mobile devices.
+
 ## Props
 
-| Prop              | Type   | Required | Default | Description                     |
-|-------------------|--------|----------|---------|---------------------------------|
-| `src`            | string | Yes      | -       | Image source URL               |
-| `containerWidth` | number | No       | 800     | Width of the container         |
-| `containerHeight`| number | No       | 400     | Height of the container        |
-| `isEditing`      | boolean| No       | false    | Enable/disable drag mode      |
-| `onSave`         | function | No     | -        | Callback with crop data       |
+| Prop              | Type     | Required | Default             | Description                     |
+|-------------------|----------|----------|---------------------|---------------------------------|
+| `src`             | string   | Yes      | -                   | Image source URL                |
+| `alt`             | string   | No       | "Croppable image"   | Alt text for the image          |
+| `containerWidth`  | number   | No       | 800                 | Width of the container          |
+| `containerHeight` | number   | No       | 400                 | Height of the container         |
+| `isEditing`       | boolean  | No       | false               | Enable/disable drag mode        |
+| `onSave`          | function | No       | -                   | Callback with crop data         |
 
 ## Example Use Cases
 

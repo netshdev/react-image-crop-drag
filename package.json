@@ -1,6 +1,6 @@
 {
   "name": "react-image-crop-drag",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "React component for draggable image crop view with vertical adjustment",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -33,6 +33,6 @@
     "drag",
     "poster"
   ],
-  "author": "netsh.dev",
+  "author": "netshdev",
   "license": "MIT"
 }
