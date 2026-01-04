@@ -4,7 +4,8 @@ A React component for creating draggable image views with automatic scaling and 
 
 ## Features
 
-- **Vertical drag adjustment** for perfect image positioning
+- **Vertical and Horizontal drag adjustment** for perfect image positioning
+- **Zoom support** for detailed cropping and 2D scrolling
 - **Automatic image scaling** while maintaining aspect ratio
 - **Smooth animations and transitions**
 - **Accessibility first** with keyboard navigation
@@ -27,6 +28,7 @@ import ImageCropView from 'react-image-crop-drag';
 
 function App() {
   const [isEditing, setIsEditing] = useState(false);
+  const [zoom, setZoom] = useState(1);
 
   const handleSave = (cropData) => {
     setIsEditing(false);
@@ -39,18 +41,18 @@ function App() {
       containerWidth={800}
       containerHeight={400}
       isEditing={isEditing}
+      zoom={zoom}
       onSave={handleSave}
     />
   );
 }
-
 ```
 
 ## Accessibility
 
 This component is built with accessibility in mind:
 
-- **Keyboard Support**: When in editing mode, the container is focusable. Use **Up/Down Arrow keys** to adjust the image position.
+- **Keyboard Support**: When in editing mode, the container is focusable. Use **Arrow keys** (Up/Down/Left/Right) to adjust the image position.
 - **Screen Readers**: Helper texts and ARIA attributes provide context to screen reader users.
 - **Touch Support**: Full touch support for dragging on mobile devices.
 
@@ -63,6 +65,7 @@ This component is built with accessibility in mind:
 | `containerWidth`  | number   | No       | 800                 | Width of the container          |
 | `containerHeight` | number   | No       | 400                 | Height of the container         |
 | `isEditing`       | boolean  | No       | false               | Enable/disable drag mode        |
+| `zoom`            | number   | No       | 1                   | Zoom level (multiplier)         |
 | `onSave`          | function | No       | -                   | Callback with crop data         |
 
 ## Example Use Cases

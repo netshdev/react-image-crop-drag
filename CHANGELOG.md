@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0] - 2026-01-04
+
+### Added
+
+- **Horizontal Dragging**: Support for dragging images horizontally if they are wider than the container.
+- **Zoom Support**: New `zoom` prop to scale images, enabling 2D scrolling/positioning when zoomed in.
+
 All notable changes to this project will be documented in this file.
 
 ## [1.1.0] - 2026-01-04

@@ -6,11 +6,12 @@ const ImageCropView = ({
   containerWidth = 800,
   containerHeight = 400,
   isEditing,
+  zoom = 1,
 }) => {
-  const [position, setPosition] = useState({ y: 0 });
+  const [position, setPosition] = useState({ x: 0, y: 0 });
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
   const [isDragging, setIsDragging] = useState(false);
-  const [startY, setStartY] = useState(0);
+  const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const imageRef = useRef(null);
   const containerRef = useRef(null);
 
@@ -22,21 +23,42 @@ const ImageCropView = ({
       let width = containerWidth;
       let height = containerWidth / aspectRatio;
 
-
-      if (height < containerHeight) {
-        height = containerHeight;
-        width = containerHeight * aspectRatio;
+      if (width < containerWidth || height < containerHeight) {
+        const containerRatio = containerWidth / containerHeight;
+        if (aspectRatio > containerRatio) {
+          height = containerHeight;
+          width = containerHeight * aspectRatio;
+        } else {
+          width = containerWidth;
+          height = containerWidth / aspectRatio;
+        }
       }
 
-      setImageSize({ width, height });
-      setPosition({ y: (containerHeight - height) / 2 });
-    };
-  }, [src, containerWidth, containerHeight]);
+      width *= zoom;
+      height *= zoom;
 
-  const constrainY = (y) => {
+      setImageSize({ width, height });
+      setPosition({
+        x: (containerWidth - width) / 2,
+        y: (containerHeight - height) / 2
+      });
+    };
+
+    image.onerror = (err) => {
+      console.error("ImageCropView: Failed to load image", src, err);
+    };
+  }, [src, containerWidth, containerHeight, zoom]);
+
+  const constrain = (x, y) => {
+    const minX = containerWidth - imageSize.width;
+    const maxX = 0;
     const minY = containerHeight - imageSize.height;
     const maxY = 0;
-    return Math.min(maxY, Math.max(minY, y));
+
+    return {
+      x: Math.min(maxX, Math.max(minX, x)),
+      y: Math.min(maxY, Math.max(minY, y))
+    };
   };
 
   const handleMouseDown = (e) => {
@@ -46,7 +68,10 @@ const ImageCropView = ({
     }
     e.preventDefault();
     setIsDragging(true);
-    setStartY(e.clientY - position.y);
+    setStartPos({
+      x: e.clientX - position.x,
+      y: e.clientY - position.y
+    });
   };
 
   const handleMouseMove = (e) => {
@@ -54,8 +79,9 @@ const ImageCropView = ({
       return;
     }
 
-    const newY = e.clientY - startY;
-    setPosition({ y: constrainY(newY) });
+    const newX = e.clientX - startPos.x;
+    const newY = e.clientY - startPos.y;
+    setPosition(constrain(newX, newY));
   };
 
   const handleMouseUp = () => {
@@ -65,15 +91,19 @@ const ImageCropView = ({
   const handleTouchStart = (e) => {
     if (!isEditing) return;
     setIsDragging(true);
-    setStartY(e.touches[0].clientY - position.y);
+    setStartPos({
+      x: e.touches[0].clientX - position.x,
+      y: e.touches[0].clientY - position.y
+    });
   };
 
   const handleTouchMove = (e) => {
     if (!isEditing || !isDragging) return;
     if (e.cancelable) e.preventDefault();
 
-    const newY = e.touches[0].clientY - startY;
-    setPosition({ y: constrainY(newY) });
+    const newX = e.touches[0].clientX - startPos.x;
+    const newY = e.touches[0].clientY - startPos.y;
+    setPosition(constrain(newX, newY));
   };
 
   const handleTouchEnd = () => {
@@ -84,19 +114,27 @@ const ImageCropView = ({
     if (!isEditing) return;
 
     const step = 20;
-    let newY = position.y;
+    let { x: newX, y: newY } = position;
 
-    if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      newY -= step;
-    } else if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      newY += step;
-    } else {
-      return;
+    switch (e.key) {
+      case 'ArrowUp':
+        newY -= step;
+        break;
+      case 'ArrowDown':
+        newY += step;
+        break;
+      case 'ArrowLeft':
+        newX -= step;
+        break;
+      case 'ArrowRight':
+        newX += step;
+        break;
+      default:
+        return;
     }
 
-    setPosition({ y: constrainY(newY) });
+    e.preventDefault();
+    setPosition(constrain(newX, newY));
   };
 
   return (
@@ -104,7 +142,7 @@ const ImageCropView = ({
       ref={containerRef}
       role="application"
       aria-label="Image Cropper"
-      aria-description="Use Up and Down arrow keys to adjust current image position."
+      aria-description="Use Arrow keys to adjust image position."
       tabIndex={isEditing ? 0 : -1}
       onKeyDown={handleKeyDown}
       style={{
@@ -126,11 +164,12 @@ const ImageCropView = ({
           width: imageSize.width,
           height: imageSize.height,
           position: "absolute",
-          left: "50%",
-          transform: `translateX(-50%) translateY(${position.y}px)`,
+          left: 0,
+          top: 0,
+          transform: `translate3d(${position.x}px, ${position.y}px, 0)`,
           transition: isDragging ? "none" : "transform 0.1s ease",
           userSelect: "none",
-          objectFit: "cover",
+          objectFit: "fill",
           pointerEvents: isEditing ? "auto" : "none",
           touchAction: "none"
         }}
